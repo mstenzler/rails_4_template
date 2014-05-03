@@ -8,6 +8,12 @@ include ApplicationHelper
 #  end
 #end
 
+DEBUG_LEVEL = 0
+
+def debug(msg, level=0)
+  p "DEBUG: #{msg}" if DEBUG_LEVEL > level
+end
+
 def valid_signin(user)
   fill_in "Email",    with: user.email
   fill_in "Password", with: user.password

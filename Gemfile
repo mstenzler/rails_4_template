@@ -62,9 +62,11 @@ gem 'geocoder'
 gem 'cancan'
 #gem "factory_girl_rails", ">= 4.2.0", :group => [:development, :test]
 gem "bootstrap-sass",  '~> 3.0.3.0'
-gem 'bootstrap_form'
+gem 'bootstrap_form', '~> 2.1.1'
 gem 'will_paginate'
 gem 'bootstrap-will_paginate'
+#gem 'date_validator'
+gem 'validates_timeliness', github: 'adzap/validates_timeliness', branch: 'rails4'
 
 # Use ActiveModel has_secure_password
 gem 'bcrypt-ruby', '~> 3.1.2'

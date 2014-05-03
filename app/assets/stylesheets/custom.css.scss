@@ -1,4 +1,5 @@
 @import "bootstrap";
+@import 'rails_bootstrap_forms';
 
 /* mixins, variables, etc. */
 
@@ -182,6 +183,9 @@ input {
   margin-bottom: 2px;
 }
 
+.auto-width {
+  width: auto;
+}
 
 /* Users index */
 

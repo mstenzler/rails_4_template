@@ -1,13 +1,48 @@
 require 'spec_helper'
 
+def reload_user
+  Object.send(:remove_const, :User)
+  load(File.expand_path("app/models/user.rb", Rails.root))
+end
+
+def create_user(opts = {})
+  args = { name: "Example User", username: "miketheuser4", email: "user@example.com",
+           password: "foobar", password_confirmation: "foobar", 
+           gender: User::MALE_VALUE, birthdate: Time.now-25.years }
+  args.merge!(opts)
+  @user = User.new(args)
+  debug "In create_user. user = #{@user.inspect}"
+end
+
+#CONFIG = FactoryGirl.build(:full_config)
+
 describe User do
 
-  before { @user = User.new(name: "Example User", email: "user@example.com",
-                   password: "foobar", password_confirmation: "foobar") }
+  p "*******DEBUG_LEVEL = '#{DEBUG_LEVEL}'"
+  #p "CONFIG = '#{CONFIG}'"
+#  CONFIG[:require_username?] = false
+#  CONFIG[:enable_username?] = true
+  CONFIG = FactoryGirl.build(:full_config)
+  debug "CONFIG = '#{CONFIG}'", 2
+  reload_user
+#  Object.send(:remove_const, :User)
+#  load(File.expand_path("app/models/user.rb", Rails.root))
+
+
+  before do
+ #   Object.send(:remove_const, :User)
+#    CONFIG = FactoryGirl.build(:config, enable_username_1?: false, require_username?: false, require_gender?: false, require_birthday?: false)
+ #CONFIG[:require_username?] = false
+ # CONFIG[:enable_username?] = false
+ #   load(File.expand_path("app/models/user.rb", Rails.root))
+   # @user = User.new(name: "Example User", email: "user@example.com",
+    #               password: "foobar", password_confirmation: "foobar") 
+    create_user
+  
+  end
 
   subject { @user }
 
-  it { should respond_to(:name) }
   it { should respond_to(:email) }
   it { should respond_to(:password_digest) }
   it { should respond_to(:password) }
@@ -15,6 +50,22 @@ describe User do
   it { should respond_to(:remember_token)}
   it { should respond_to(:authenticate) }
   it { should respond_to(:admin) }
+
+  if CONFIG[:enable_name?]
+    it { should respond_to(:name) }
+  end
+
+  if CONFIG[:enable_username?]
+    it { should respond_to(:username) }
+  end
+
+  if CONFIG[:enable_gender?]
+    it { should respond_to(:gender) }
+  end
+
+  if CONFIG[:enable_birthdate?]
+    it { should respond_to(:birthdate) }
+  end
 
   it { should be_valid }
   it { should_not be_admin}
@@ -27,23 +78,13 @@ describe User do
 
     it { should be_admin }
   end
-  
-  describe "when name is not present" do
-  	before { @user.name = " " }
-  	it { should_not be_valid }
-  end
 
   describe "when email is not present" do
-  	before { @user.email = " "}
-  	it { should_not be_valid }
+    before { @user.email = " "}
+    it { should_not be_valid }
   end
 
-  describe "when name is too long" do
-  	before { @user.name = "a" * 51 }
-  	it { should_not be_valid }
-  end
-
-   describe "when email format is invalid" do
+  describe "when email format is invalid" do
     it "should be invalid" do
       addresses = %w[user@foo,com user_at_foo.org example.user@foo.
                      foo@bar_baz.com foo@bar+baz.com foo@bar..com]
@@ -107,6 +148,77 @@ describe User do
       specify { expect(user_for_invalid_password).to be_false }
     end
   end
+
+  if CONFIG[:require_name?]
+    describe "when name is not present" do
+      before { @user.name = " " }
+      it { should_not be_valid }
+    end
+
+    describe "when name is too long" do
+      before { @user.name = "a" * (User::NAME_MAX_LENGTH + 1) }
+      it { should_not be_valid }
+    end  
+    describe "when name is too short" do
+      before { @user.name = "a" * (User::NAME_MIN_LENGTH - 1) }
+      it { should_not be_valid }
+    end  
+  end
+
+  if CONFIG[:require_username?]
+    describe "when username is not present" do
+      before { @user.username = " " }
+      it { should_not be_valid }
+    end
+
+    describe "when username is too long" do
+      before do
+       @user.username = "a" * (User::USERNAME_MAX_LENGTH + 1) 
+       p "username length = #{@user.username.length}, USERNAME_MAX_LENGTH +1 = #{User::USERNAME_MAX_LENGTH + 1}"
+     end
+      it { should_not be_valid }
+    end
+
+    describe "when username starts with a number" do
+      before { @user.username = "3forty" }
+      it { should_not be_valid }
+    end
+  end #if require_username?
+
+  if CONFIG[:require_gender?]
+    describe "when gender is not present" do
+      before { @user.gender = " " }
+      it { should_not be_valid }
+    end
+
+    describe "when gender is not a valid gender" do
+      before { @user.gender = "foobar" }
+      it { should_not be_valid }
+    end
+  end
+
+  if CONFIG[:require_birthdate?]
+    describe "when birthdate is not present" do
+      before { @user.birthdate = " "}
+      it { should_not be_valid }
+    end
+
+    if CONFIG[:min_age]
+      describe "when age is less than min_age" do
+        before { @user.birthdate = (CONFIG[:min_age].to_i-1).years.ago }
+        it { should_not be_valid }
+      end
+    end
+
+    if CONFIG[:max_age]
+      describe "when age is greater than max_age" do
+        before { @user.birthdate = (CONFIG[:max_age].to_i+1).years.ago }
+        it { should_not be_valid }
+      end
+    end
+  end
+
+
 
   describe "email address with mixed case" do
     let(:mixed_case_email) { "Foo@ExAMPle.CoM" }

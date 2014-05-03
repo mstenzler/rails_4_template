@@ -1,0 +1,20 @@
+title: App Template
+display_name: Application Template
+min_age: 18
+max_age: 140
+user_form_options: ['name?', 'username?', 'gender?', 'birthdate?']
+enable_name?: true
+require_name?: true
+enable_username?: true
+require_username?: true
+enable_gender?: true
+require_gender?: true
+enable_birthdate?: true
+require_birthdate?: true
+user_name_field: email_or_username
+development:
+  host: "localhost:3000"
+test:
+  host: "test.local"
+production:
+  host: "www.ApplicationTemplate.com"

@@ -1,9 +1,47 @@
 <%= render 'shared/error_messages' %>
 
-	<div class="form-group">
-	  <%= f.label :name %>
-	  <%= f.text_field :name, class: 'form-control' %>
-	</div>
+  <% if require_name? %>
+    <%= f.text_field :name %>
+  <% end %>
+
+  <% if require_username? %>
+	    <%= f.text_field :username %>
+  <% end %>
+
+	<%= f.text_field :email %>
+	<%= f.password_field :password %>
+  <%= f.password_field :password_confirmation %>
+
+  <% if require_gender? %>
+	    <%= f.collection_select( :gender, User::VALID_GENDERS, :to_s, :to_s, {}, { :class => "auto-width" }) %>
+  <% end %>
+
+ <% if require_birthdate? %>
+	     <%= f.date_select :birthdate,
+                    {  :start_year => 1910,
+                      :end_year => User::CURRENT_YEAR,
+                    },
+                    {
+                    :class => "small"
+                    }
+       %>
+
+  <% end %>
+
+<% if false %>
+  <% if require_name? %>
+  	<div class="form-group">
+	    <%= f.label :name %>
+	    <%= f.text_field :name, class: 'form-control' %>
+	  </div>
+	<% end %>
+
+  <% if require_username? %>
+   	<div class="form-group">
+	    <%= f.label :username %>
+	    <%= f.text_field :username, class: 'form-control' %>
+	  </div> 
+  <% end %>
 
 	<div class="form-group">
 	  <%= f.label :email %>
@@ -19,3 +57,26 @@
 	  <%= f.label :password_confirmation, "Confirm Password" %>
 	  <%= f.password_field :password_confirmation, class: 'form-control'  %>
 	</div>
+
+  <% if require_gender? %>
+   	<div class="form-group">
+	    <%= f.label :gender %>
+	    <%= f.collection_select( :gender, User::VALID_GENDERS, :to_s, :to_s, {}, { :class => "small" }) %>
+	  </div> 
+  <% end %>
+
+<% if require_birthdate? %>
+   	<div class="form-group">
+	    <%= f.label :birthdate %>
+	     <%= f.date_select :birthdate,
+                    {  :start_year => 1910,
+                      :end_year => User::CURRENT_YEAR,
+                    },
+                    {
+                    :class => "small"
+                    }
+       %>
+	  </div> 
+
+  <% end %>
+<% end %>
