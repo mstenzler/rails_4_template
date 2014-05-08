@@ -1,10 +1,12 @@
 <%= render 'shared/error_messages' %>
 
-  <% if require_name? %>
+  <% user_obj = f.object %>
+
+  <% if use_name?(user_obj) %>
     <%= f.text_field :name %>
   <% end %>
 
-  <% if require_username? %>
+  <% if use_username?(user_obj) %>
 	    <%= f.text_field :username %>
   <% end %>
 
@@ -12,11 +14,11 @@
 	<%= f.password_field :password %>
   <%= f.password_field :password_confirmation %>
 
-  <% if require_gender? %>
+  <% if use_gender?(user_obj) %>
 	    <%= f.collection_select( :gender, User::VALID_GENDERS, :to_s, :to_s, {}, { :class => "auto-width" }) %>
   <% end %>
 
- <% if require_birthdate? %>
+ <% if use_birthdate?(user_obj) %>
 	     <%= f.date_select :birthdate,
                     {  :start_year => 1910,
                       :end_year => User::CURRENT_YEAR,
@@ -26,6 +28,13 @@
                     }
        %>
 
+  <% end %>
+
+ <% if use_time_zone?(user_obj) %>
+	  <div class="form-group">
+	    <%= f.label :time_zone %>
+      <%= f.time_zone_select(:time_zone, ActiveSupport::TimeZone.us_zones, {}, { class: "form-control auto-width", id: "time-zone-select" } )%>
+    </div>
   <% end %>
 
 <% if false %>

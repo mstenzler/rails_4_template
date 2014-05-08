@@ -1,5 +1,16 @@
 require 'spec_helper'
 
+NAME_LABEL = "Name"
+USERNAME_LABEL = "Username"
+EMAIL_LABEL = "Email"
+PASSWORD_LABEL = "Password"
+CONFIRM_PASSWORD_LABEL = "Password confirmation"
+GENDER_LABEL = "Gender"
+BIRTHDATE_LABEL = "Birthdate"
+TIME_ZONE_LABEL = "Time zone"
+
+BIRTHDATE = Time.now - 25.years
+
 describe "User pages" do
 
   subject { page }
@@ -85,10 +96,10 @@ describe "User pages" do
 
       describe "after submit with bad email" do
       	before do
-          fill_in "Name",         with: "Example User"
-          fill_in "Email",        with: "user@example"
-          fill_in "Password",     with: "foobar"
-          fill_in "Confirm Password", with: "foobar"
+          fill_in NAME_LABEL,         with: "Example User"
+          fill_in EMAIL_LABEL,        with: "user@example"
+          fill_in PASSWORD_LABEL,     with: "foobar"
+          fill_in CONFIRM_PASSWORD_LABEL, with: "foobar"
           click_button submit
         end
 
@@ -98,10 +109,10 @@ describe "User pages" do
 
       describe "after submit with blank password" do
       	before do
-          fill_in "Name",         with: "Example User"
-          fill_in "Email",        with: "user@example.com"
-          fill_in "Password",     with: ""
-          fill_in "Confirm Password", with: ""
+          fill_in NAME_LABEL,         with: "Example User"
+          fill_in EMAIL_LABEL,        with: "user@example.com"
+          fill_in PASSWORD_LABEL,     with: ""
+          fill_in CONFIRM_PASSWORD_LABEL, with: ""
           click_button submit
         end
 
@@ -111,10 +122,10 @@ describe "User pages" do
 
       describe "after submit with blank name" do
       	before do
-          fill_in "Name",         with: ""
-          fill_in "Email",        with: "user@example.com"
-          fill_in "Password",     with: "foobar"
-          fill_in "Confirm Password", with: "foobar"
+          fill_in NAME_LABEL,         with: ""
+          fill_in EMAIL_LABEL,        with: "user@example.com"
+          fill_in PASSWORD_LABEL,     with: "foobar"
+          fill_in CONFIRM_PASSWORD_LABEL, with: "foobar"
           click_button submit
         end
 
@@ -124,10 +135,10 @@ describe "User pages" do
 
       describe "after submit with blank email" do
       	before do
-          fill_in "Name",         with: "Example User"
-          fill_in "Email",        with: ""
-          fill_in "Password",     with: "foobar"
-          fill_in "Confirm Password", with: "foobar"
+          fill_in NAME_LABEL,         with: "Example User"
+          fill_in EMAIL_LABEL,        with: ""
+          fill_in PASSWORD_LABEL,     with: "foobar"
+          fill_in CONFIRM_PASSWORD_LABEL, with: "foobar"
           click_button submit
         end
 
@@ -137,10 +148,10 @@ describe "User pages" do
 
     	describe "after submit with mismatched password confirmation" do
       	before do
-          fill_in "Name",         with: "Example User"
-          fill_in "Email",        with: "user@example.com"
-          fill_in "Password",     with: "foo"
-          fill_in "Confirm Password", with: "foobar"
+          fill_in NAME_LABEL,         with: "Example User"
+          fill_in EMAIL_LABEL,        with: "user@example.com"
+          fill_in PASSWORD_LABEL,     with: "foo"
+          fill_in CONFIRM_PASSWORD_LABEL, with: "foobar"
           click_button submit
         end
 
@@ -150,10 +161,10 @@ describe "User pages" do
 
      	describe "after submit with password too short" do
       	before do
-          fill_in "Name",         with: "Example User"
-          fill_in "Email",        with: "user@example.com"
-          fill_in "Password",     with: "foo"
-          fill_in "Confirm Password", with: "foo"
+          fill_in NAME_LABEL,         with: "Example User"
+          fill_in EMAIL_LABEL,        with: "user@example.com"
+          fill_in PASSWORD_LABEL,     with: "foo"
+          fill_in CONFIRM_PASSWORD_LABEL, with: "foo"
           click_button submit
         end
 
@@ -165,10 +176,18 @@ describe "User pages" do
 
     describe "with valid information" do
       before do
-        fill_in "Name",         with: "Example User"
-        fill_in "Email",        with: "user@example.com"
-        fill_in "Password",     with: "foobar"
-        fill_in "Confirm Password", with: "foobar"
+        fill_in NAME_LABEL,             with: "Example User"
+        fill_in USERNAME_LABEL,          with: "example_user"
+        fill_in EMAIL_LABEL,            with: "user@example.com"
+        fill_in PASSWORD_LABEL,         with: "foobar"
+        fill_in CONFIRM_PASSWORD_LABEL, with: "foobar"
+        select 'Male',           from: "Gender"
+        select BIRTHDATE.year, from: 'user_birthdate_1i'
+        select 'January', from: 'user_birthdate_2i'
+        select BIRTHDATE.day, from: 'user_birthdate_3i'
+#        fill_in BIRTHDATE_LABEL,        with: Date.today - 25.years
+        select "Eastern Time (US & Canada)", from: 'time-zone-select'
+#        save_and_open_page
       end
 
       it "should create a user" do
@@ -179,7 +198,7 @@ describe "User pages" do
         before { click_button submit }
         let(:user) { User.find_by(email: 'user@example.com') }
 
-        it { should have_link('Sign out') }
+        it { save_and_open_page; should have_link('Sign out') }
         it { should have_title(user.name) }
         it { should have_selector('div.alert.alert-success', text: 'Welcome') }
       end
@@ -210,10 +229,10 @@ describe "User pages" do
       let(:new_name)  { "New Name" }
       let(:new_email) { "new@example.com" }
       before do
-        fill_in "Name",             with: new_name
-        fill_in "Email",            with: new_email
-        fill_in "Password",         with: user.password
-        fill_in "Confirm Password", with: user.password
+        fill_in NAME_LABEL,             with: new_name
+        fill_in EMAIL_LABEL,            with: new_email
+        fill_in PASSWORD_LABEL,         with: user.password
+        fill_in CONFIRM_PASSWORD_LABEL, with: user.password
         click_button "Save changes"
       end
 

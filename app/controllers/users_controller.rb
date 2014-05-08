@@ -17,7 +17,9 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = User.new(user_params)    # Not the final implementation!
+    @user = User.new(user_params)  
+    p "IN CREATE: @user.gender = '#{@user.gender}', @user.birthdate = '#{@user.birthdate}'"
+    @user.set_create_ip_addresses(request.remote_ip)
     if @user.save
     	sign_in @user
     	flash[:success] = "Welcome to the Sample App!"
@@ -53,11 +55,15 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
 
+  def username_taken?(uname)
+    User.username_taken?
+  end
+
   private
 
     def user_params
-      params.require(:user).permit(:name, :email, :password,
-                                   :password_confirmation)
+      params.require(:user).permit(:name, :username, :email, :password,
+                                   :password_confirmation, :gender, :birthdate, :time_zone)
     end
 
     # Before filters

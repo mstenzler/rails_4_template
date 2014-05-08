@@ -1,6 +1,7 @@
 class User < ActiveRecord::Base
 	before_save { email.downcase! }
 	before_create :create_remember_token
+  before_create :init_new_user
 
   NAME_MAX_LENGTH = 32
   NAME_MIN_LENGTH = 2
@@ -35,15 +36,21 @@ class User < ActiveRecord::Base
   username_can_be_blank = CONFIG[:require_username?] ? false : true
   gender_can_be_blank = CONFIG[:require_gender?] ? false : true
   birthdate_can_be_blank = CONFIG[:require_birthdate?] ? false : true
+  time_zone_can_be_blank = CONFIG[:require_time_zone?] ? false : true
 
-  validates :name, allow_blank: name_can_be_blank, format: { with: VALID_NAME_REGEX },
+#  p "IN VALIDATE: gender = '#{gender}', birthdate = '#{birthdate}'"
+p "IN VALIDATE: name_can_be_blank = '#{name_can_be_blank}', CONFIG[:require_name?] = #{CONFIG[:require_name?]}'"
+
+  validates :name, allow_blank: name_can_be_blank, presence: !name_can_be_blank, 
+            format: { with: VALID_NAME_REGEX },
             length: {minimum: NAME_MIN_LENGTH, maximum: NAME_MAX_LENGTH},
             if: "CONFIG[:enable_name?]"
 #  p "Validates name with maximum length of #{NAME_MAX_LENGTH}"
 
  #   req_username = CONFIG[:require_username?] || false
     p "DEFINING USERNAME. username_can_be_blank = #{username_can_be_blank}"
-    validates :username, allow_blank: username_can_be_blank, format: { with: VALID_USERNAME_REGEX },
+    validates :username, allow_blank: username_can_be_blank, presence: !username_can_be_blank, 
+              format: { with: VALID_USERNAME_REGEX },
               uniqueness: { case_sensitive: false},
               length: {minimum: USERNAME_MIN_LENGTH, maximum: USERNAME_MAX_LENGTH},
               if: "CONFIG[:enable_username?]"
@@ -51,8 +58,12 @@ class User < ActiveRecord::Base
   validates :email, presence: true, format: { with: VALID_EMAIL_REGEX },
                     uniqueness: { case_sensitive: false }
 
-  validates :gender, allow_blank: gender_can_be_blank, inclusion: { in: VALID_GENDERS },
+  validates :gender, allow_blank: gender_can_be_blank, presence: !gender_can_be_blank, 
+             inclusion: { in: VALID_GENDERS },
             if: "CONFIG[:enable_gender?]"
+  validates :time_zone, allow_blank: time_zone_can_be_blank, presence: !time_zone_can_be_blank, 
+             inclusion: { in: ActiveSupport::TimeZone.zones_map(&:name) },
+            if: "CONFIG[:enable_time_zone?]"
  
 
   if CONFIG[:enable_birthdate?]
@@ -71,8 +82,12 @@ class User < ActiveRecord::Base
 
 	has_secure_password
 	validates :password, length: { minimum: 6 }
-
-  def User.new_remember_token
+  
+  def User.username_taken?(uname)
+    where(username: uname).take ? true : false
+  end
+  
+  def User.new_token
     SecureRandom.urlsafe_base64
   end
 
@@ -80,10 +95,30 @@ class User < ActiveRecord::Base
     Digest::SHA1.hexdigest(token.to_s)
   end
 
+  def init_unvalidated_email
+    self.email_validation_token = User.hash(User.new_token)
+    self.email_validated = false
+    self.email_changed_at = Time.zone.now
+  end
+
+  def set_create_ip_addresses(adr)
+    self.ip_address_created = self.ip_address_last_modified = adr
+  end
+  
   private
 
     def create_remember_token
-      self.remember_token = User.hash(User.new_remember_token)
+      self.remember_token = User.hash(User.new_token)
+    end
+
+    def create_validation_token
+      self.validation_token = User.hash(User.new_token)
+    end
+
+    def init_new_user
+      if new_record?
+        init_unvalidated_email
+      end
     end
 
 end

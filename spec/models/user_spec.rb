@@ -235,4 +235,18 @@ describe User do
     its(:remember_token) { should_not be_blank }
   end
 
+  describe "username_taken? function" do
+    before do
+      @user.username = 'foobartest1'
+      @user.save
+    end
+
+    it "should be true" do
+      expect(User.username_taken?('foobartest1')).to eq true 
+    end
+    it "should be false" do
+      expect(User.username_taken?('foobartest2')).to eq false
+    end
+  end
+
 end

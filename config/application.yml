@@ -2,7 +2,7 @@ title: App Template
 display_name: Application Template
 min_age: 18
 max_age: 140
-user_form_options: ['name?', 'username?', 'gender?', 'birthdate?']
+user_form_options: ['name?', 'username?', 'gender?', 'birthdate?', 'time_zone?']
 enable_name?: true
 require_name?: true
 enable_username?: true
@@ -11,6 +11,9 @@ enable_gender?: true
 require_gender?: true
 enable_birthdate?: true
 require_birthdate?: true
+enable_time_zone?: true
+require_time_zone?: true
+validate_email?: true
 user_name_field: email_or_username
 development:
   host: "localhost:3000"
