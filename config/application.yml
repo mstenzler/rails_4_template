@@ -13,7 +13,7 @@ enable_birthdate?: true
 require_birthdate?: true
 enable_time_zone?: true
 require_time_zone?: true
-validate_email?: true
+verify_email?: true
 user_name_field: email_or_username
 development:
   host: "localhost:3000"

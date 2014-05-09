@@ -1,7 +1,9 @@
 class User < ActiveRecord::Base
 	before_save { email.downcase! }
 	before_create :create_remember_token
-  before_create :init_new_user
+  before_save :init_new_user
+
+  attr_accessor :verify_token 
 
   NAME_MAX_LENGTH = 32
   NAME_MIN_LENGTH = 2
@@ -39,7 +41,7 @@ class User < ActiveRecord::Base
   time_zone_can_be_blank = CONFIG[:require_time_zone?] ? false : true
 
 #  p "IN VALIDATE: gender = '#{gender}', birthdate = '#{birthdate}'"
-p "IN VALIDATE: name_can_be_blank = '#{name_can_be_blank}', CONFIG[:require_name?] = #{CONFIG[:require_name?]}'"
+#p "IN VALIDATE: name_can_be_blank = '#{name_can_be_blank}', CONFIG[:require_name?] = #{CONFIG[:require_name?]}'"
 
   validates :name, allow_blank: name_can_be_blank, presence: !name_can_be_blank, 
             format: { with: VALID_NAME_REGEX },
@@ -48,7 +50,7 @@ p "IN VALIDATE: name_can_be_blank = '#{name_can_be_blank}', CONFIG[:require_name
 #  p "Validates name with maximum length of #{NAME_MAX_LENGTH}"
 
  #   req_username = CONFIG[:require_username?] || false
-    p "DEFINING USERNAME. username_can_be_blank = #{username_can_be_blank}"
+ #   p "DEFINING USERNAME. username_can_be_blank = #{username_can_be_blank}"
     validates :username, allow_blank: username_can_be_blank, presence: !username_can_be_blank, 
               format: { with: VALID_USERNAME_REGEX },
               uniqueness: { case_sensitive: false},
@@ -96,15 +98,30 @@ p "IN VALIDATE: name_can_be_blank = '#{name_can_be_blank}', CONFIG[:require_name
   end
 
   def init_unvalidated_email
-    self.email_validation_token = User.hash(User.new_token)
+    token = User.new_token
+#    p "IN INIT. token = #{token}"
+    self.email_validation_token = User.hash(token)
     self.email_validated = false
     self.email_changed_at = Time.zone.now
+  end
+
+  def reset_email_validation_token(overide_token=nil)
+    #helpful for testing
+    token = overide_token.nil? ? User.new_token : overide_token
+    hashed_token = User.hash(token)
+    self.email_validation_token = hashed_token
+    self.email_validated = false
+    { token: token, hashed_token: hashed_token}
   end
 
   def set_create_ip_addresses(adr)
     self.ip_address_created = self.ip_address_last_modified = adr
   end
   
+  def validate_email
+    self.update_attribute :email_validated, true
+  end
+
   private
 
     def create_remember_token

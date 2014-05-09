@@ -18,12 +18,17 @@ class UsersController < ApplicationController
 
   def create
     @user = User.new(user_params)  
-    p "IN CREATE: @user.gender = '#{@user.gender}', @user.birthdate = '#{@user.birthdate}'"
+#    p "IN CREATE: @user.gender = '#{@user.gender}', @user.birthdate = '#{@user.birthdate}'"
     @user.set_create_ip_addresses(request.remote_ip)
     if @user.save
     	sign_in @user
-    	flash[:success] = "Welcome to the Sample App!"
-      redirect_to @user
+      if CONFIG[:verify_email?]
+        redirect_to new_user_verify_email_path(@user)
+#        render 'show_verify_email'
+      else
+    	  flash[:success] = "Welcome to the Sample App!"
+        redirect_to @user
+      end
     else
       render 'new'
     end
@@ -53,6 +58,22 @@ class UsersController < ApplicationController
       flash[:success] = "User deleted."
     end
     redirect_to users_url
+  end
+
+  def verify_email
+    @user = User.find(params[:id])
+    verify_token = params[:verify_token]
+    if verify_token
+      if @user.email_validation_token == User.hash(verify_token)
+        @user.validate_email
+        render 'verify_email_success'
+      else
+        flash[:error] = "Not a valid email validation token for this user"
+        render 'show_verify_email'
+      end
+    else
+      render 'show_verify_email'
+    end
   end
 
   def username_taken?(uname)

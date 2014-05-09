@@ -1,5 +1,16 @@
 SampleApp::Application.routes.draw do
-  resources :users
+
+  resources :users do
+    resources :verify_emails, only: [:new, :create, :patch]
+#    member do
+#      get 'verify_email/:verify_token', to: "users#verify_email"
+#      get 'verify_email'
+#      patch 'verify_email'
+#    end
+  end
+
+  get '/users/:user_id/verify_email/:verify_token', to: "verify_emails#new", as: 'verify_email_link'
+ 
   resources :sessions, only: [:new, :create, :destroy]
 
   root  'static_pages#home'

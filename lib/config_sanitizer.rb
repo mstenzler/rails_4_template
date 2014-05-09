@@ -22,7 +22,7 @@ module ConfigSanitizer
 #  		p "In check_require_enabled, config = '#{config}'"
   		require_sym = "require_#{attribute}".to_sym
   		enable_sym = "enable_#{attribute}".to_sym
-  		p "Comparing '#{require_sym}' = '#{config[require_sym]}', '#{enable_sym}' = '#{config[enable_sym]}'"
+#  		p "Comparing '#{require_sym}' = '#{config[require_sym]}', '#{enable_sym}' = '#{config[enable_sym]}'"
 
   		if (config[require_sym] && !config[enable_sym])
   			raise ConfigError, "CONFIG[#{enable_sym.to_s}] must be true if CONFIG[#{require_sym.to_s}] is true"

@@ -5,8 +5,8 @@ class ApplicationController < ActionController::Base
   around_filter :user_time_zone, if: :current_user
   include SessionsHelper
 
-  p "CONFIG = '#{CONFIG}'"
-  p "user_form_options = '#{CONFIG[:user_form_options]}'"
+#  p "CONFIG = '#{CONFIG}'"
+#  p "user_form_options = '#{CONFIG[:user_form_options]}'"
 
   #For each of the user_form_options define require_#{option_name} and
   #enable_#{option_name} methods and make each one a helper method as well
@@ -18,17 +18,17 @@ class ApplicationController < ActionController::Base
   		CONFIG[enable_name]
   	end
   	helper_method enable_name
-  	p "defined method: '#{enable_name}'"
+#  	p "defined method: '#{enable_name}'"
   	define_method require_name do
   		CONFIG[require_name]
   	end
   	helper_method require_name
-  	p "defined method: '#{require_name}'"
+#  	p "defined method: '#{require_name}'"
   	define_method use_name do |user_object|
   		user_object.new_record? ? CONFIG[require_name] : CONFIG[enable_name]
   	end
   	helper_method use_name
-  	p "defined method: '#{use_name}'"
+#  	p "defined method: '#{use_name}'"
   end
 
 =begin

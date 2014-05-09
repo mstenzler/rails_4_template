@@ -198,13 +198,68 @@ describe "User pages" do
         before { click_button submit }
         let(:user) { User.find_by(email: 'user@example.com') }
 
-        it { save_and_open_page; should have_link('Sign out') }
-        it { should have_title(user.name) }
-        it { should have_selector('div.alert.alert-success', text: 'Welcome') }
+        if CONFIG[:verify_email?]
+ #         p "Showing Verify Email Page after create"
+          it { should have_title('Verify Email Address') }
+        else
+#          p "Redirecting to @user after create"
+          it { should have_link('Sign out') }
+          it { should have_title(user.name) }
+          it { should have_selector('div.alert.alert-success', text: 'Welcome') }
+        end
       end
 
     end
   end
+
+  if CONFIG[:verify_email?]
+    describe "verify email" do
+
+      let(:submit) { "Verify" }
+      let(:user) { FactoryGirl.create(:user) }
+      let(:verify_email_label) { 'Verify token' }
+
+      before do
+        user.save!
+        visit new_user_verify_email_path(user) 
+      end
+
+      describe "page" do
+        it { should have_title('Verify Email Address') }
+      end
+
+      describe "with blank token" do
+        before { click_button submit }
+
+        it { should have_content('error') }
+      end
+
+      describe "with invalid token" do 
+        before do
+          fill_in verify_email_label,  with: 'foobar'
+          click_button submit
+        end
+
+        it { should have_content('error') }
+        it { should have_title('Verify Email Address') }
+      end
+
+      describe "with valid token" do 
+        before do
+          opts = user.reset_email_validation_token
+          user.save!
+#          p "New token = '#{opts[:token]}'"
+          fill_in verify_email_label,  with: opts[:token]
+          click_button submit
+        end
+
+#        it { save_and_open_page; should_not have_content('error') }
+        it { should_not have_content('error') }
+        it { should have_title('Email Validation Success') }
+        specify { expect(user.reload.email_validated).to eq true }
+      end
+    end
+  end #if CONFIG[:verify_email?]
 
   describe "edit" do
     let(:user) { FactoryGirl.create(:user) }
