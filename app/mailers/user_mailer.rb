@@ -1,5 +1,5 @@
 class UserMailer < ActionMailer::Base
-  default from: "mailer@nexuscafe.com"
+  default from: "mailer@example.com"
 
   def email_validation_token(user)
     @user = user

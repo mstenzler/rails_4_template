@@ -1,5 +1,7 @@
 require "spec_helper"
 
+FROM_EMAIL = "mailer@example.com"
+
 describe UserMailer do
 
   describe 'email validation' do
@@ -10,7 +12,7 @@ describe UserMailer do
      describe "send email validation token url" do
       specify { expect(mail.subject).to eq("Email Validation Code")  }
       specify { expect(mail.to).to eq([user.email]) }
-      specify { expect(mail.from).to eq(["mailer@nexuscafe.com"]) }
+      specify { expect(mail.from).to eq([FROM_EMAIL]) }
       specify { expect(mail.body.encoded).to match(verify_email_token_path(user.id, user.email_validation_token)) }
  #     specify { expect(last_email).to include(user.email) }
     end
@@ -23,7 +25,7 @@ describe UserMailer do
     describe "sends user password reset url" do
       specify { expect(mail.subject).to eq("Password Reset") }
       specify { expect(mail.to).to eq([user.email]) }
-      specify { expect(mail.from).to eq(["mailer@nexuscafe.com"]) }
+      specify { expect(mail.from).to eq([FROM_EMAIL]) }
     end
 
 
