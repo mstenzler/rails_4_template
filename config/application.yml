@@ -1,5 +1,5 @@
-title: App Template
-display_name: Application Template
+title: Rails 4 App Template
+display_name: Rails Template
 min_age: 18
 max_age: 140
 user_form_options: ['name?', 'username?', 'gender?', 'birthdate?', 'time_zone?']
