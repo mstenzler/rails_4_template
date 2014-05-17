@@ -8,7 +8,7 @@ describe ConfigSanitizer do
 #  p "attributes = #{@attributes}"
 
   before(:all) do
-  	p "In Before all"
+#  	p "In Before all"
     @dummy = DummyClass.new
     @dummy.extend ConfigSanitizer
   end
@@ -35,7 +35,7 @@ describe ConfigSanitizer do
   		end
 
   		it "fails check" do
-  			p "In it fails check. Attr = #{attr}, config = #{config}"
+ # 			p "In it fails check. Attr = #{attr}, config = #{config}"
   			expect {
   				@dummy.check_config(config)
   				}.to raise_error ConfigSanitizer::ConfigError

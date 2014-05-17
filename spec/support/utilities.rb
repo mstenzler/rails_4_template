@@ -9,6 +9,7 @@ include ApplicationHelper
 #end
 
 DEBUG_LEVEL = 0
+UTC_TIME_ZONE_VALUE = "UTC"
 
 def debug(msg, level=0)
   p "DEBUG: #{msg}" if DEBUG_LEVEL > level

@@ -10,7 +10,7 @@ BIRTHDATE_LABEL = "Birthdate"
 TIME_ZONE_LABEL = "time-zone-select"
 #TIME_ZONE_LABEL = "Time zone"
 #UTC_TIME_ZONE_VALUE = "(GMT+00:00) UTC"
-UTC_TIME_ZONE_VALUE = "UTC"
+#UTC_TIME_ZONE_VALUE = "UTC"
 CHANGE_USERNAME_BUTTON = "Change Username"
 CHANGE_EMAIL_BUTTON = "Change Email"
 BIRTHDATE = Time.now - 25.years
@@ -180,7 +180,7 @@ describe "User pages" do
 
     describe "with valid information" do
       before do
-        save_and_open_page
+#        save_and_open_page
         fill_in NAME_LABEL,             with: "Example User"
         fill_in USERNAME_LABEL,          with: "example_user"
         fill_in EMAIL_LABEL,            with: "user@example.com"

@@ -8,7 +8,7 @@ end
 def create_user(opts = {})
   args = { name: "Example User", username: "miketheuser4", email: "user@example.com",
            password: "foobar", password_confirmation: "foobar", 
-           gender: User::MALE_VALUE, birthdate: Time.now-25.years }
+           gender: User::MALE_VALUE, birthdate: Time.now-25.years, time_zone: UTC_TIME_ZONE_VALUE }
   args.merge!(opts)
   @user = User.new(args)
   debug "In create_user. user = #{@user.inspect}"
@@ -18,13 +18,15 @@ end
 
 describe User do
 
-  p "*******DEBUG_LEVEL = '#{DEBUG_LEVEL}'"
+#  p "*******DEBUG_LEVEL = '#{DEBUG_LEVEL}'"
   #p "CONFIG = '#{CONFIG}'"
 #  CONFIG[:require_username?] = false
 #  CONFIG[:enable_username?] = true
-  CONFIG = FactoryGirl.build(:full_config)
-  debug "CONFIG = '#{CONFIG}'", 2
-  reload_user
+
+#  CONFIG = FactoryGirl.build(:full_config)
+#  debug "CONFIG = '#{CONFIG}'", 2
+#  reload_user
+
 #  Object.send(:remove_const, :User)
 #  load(File.expand_path("app/models/user.rb", Rails.root))
 
