@@ -1,7 +1,16 @@
 SampleApp::Application.routes.draw do
 
+#  get "username_changes/new"
+#  get "password_resets/new"
+  resources :password_resets
   resources :users do
-    resources :verify_emails, only: [:new, :create, :patch]
+    resources :verify_emails, only: [:new, :create], shallow: true
+    resources :change_usernames, only: [:edit, :update], shallow: true
+    resources :change_emails, only: [:edit, :update], shallow: true
+#    member do
+#      get 'verify_email_token/:verify_token', to: "verify_emails#create", as: 'verify_email_token'
+#    end
+#    resources :username_changes, shallow: false
 #    member do
 #      get 'verify_email/:verify_token', to: "users#verify_email"
 #      get 'verify_email'
@@ -9,7 +18,7 @@ SampleApp::Application.routes.draw do
 #    end
   end
 
-  get '/users/:user_id/verify_email/:verify_token', to: "verify_emails#new", as: 'verify_email_link'
+  get '/users/:user_id/verify_email_token/:verify_token', to: "verify_emails#create", as: 'verify_email_token'
  
   resources :sessions, only: [:new, :create, :destroy]
 

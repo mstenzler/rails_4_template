@@ -4,4 +4,5 @@
 //invoke time zone select menu
 $(document).ready(function() {
   $('#time-zone-select').selectTimeZone();
+  //alert("In time zone!")
 });

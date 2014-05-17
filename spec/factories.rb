@@ -38,6 +38,8 @@ FactoryGirl.define do
     require_gender? true
     enable_birthdate? true
     require_birthdate? true
+    enable_time_zone? true
+    require_time_zone? true
 
     initialize_with { attributes } 
   end

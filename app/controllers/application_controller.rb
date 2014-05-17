@@ -53,6 +53,13 @@ class ApplicationController < ActionController::Base
   helper_method :enable_birthdate?
 =end
 
+  def signed_in_user
+  	unless signed_in?
+  		store_location
+      redirect_to signin_url, notice: "Please sign in."
+    end
+  end
+
   private
 
     def user_time_zone(&block)

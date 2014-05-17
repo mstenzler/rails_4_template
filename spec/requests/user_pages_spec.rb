@@ -7,8 +7,12 @@ PASSWORD_LABEL = "Password"
 CONFIRM_PASSWORD_LABEL = "Password confirmation"
 GENDER_LABEL = "Gender"
 BIRTHDATE_LABEL = "Birthdate"
-TIME_ZONE_LABEL = "Time zone"
-
+TIME_ZONE_LABEL = "time-zone-select"
+#TIME_ZONE_LABEL = "Time zone"
+#UTC_TIME_ZONE_VALUE = "(GMT+00:00) UTC"
+UTC_TIME_ZONE_VALUE = "UTC"
+CHANGE_USERNAME_BUTTON = "Change Username"
+CHANGE_EMAIL_BUTTON = "Change Email"
 BIRTHDATE = Time.now - 25.years
 
 describe "User pages" do
@@ -176,6 +180,7 @@ describe "User pages" do
 
     describe "with valid information" do
       before do
+        save_and_open_page
         fill_in NAME_LABEL,             with: "Example User"
         fill_in USERNAME_LABEL,          with: "example_user"
         fill_in EMAIL_LABEL,            with: "user@example.com"
@@ -275,19 +280,26 @@ describe "User pages" do
     end
 
     describe "with invalid information" do
-      before { click_button "Save changes" }
+      before do 
+        fill_in NAME_LABEL, with: " "
+        click_button "Save changes" 
+      end
 
       it { should have_content('error') }
     end
 
     describe "with valid information" do
       let(:new_name)  { "New Name" }
-      let(:new_email) { "new@example.com" }
+#      let(:new_email) { "new@example.com" }
       before do
+#        save_and_open_page
         fill_in NAME_LABEL,             with: new_name
-        fill_in EMAIL_LABEL,            with: new_email
-        fill_in PASSWORD_LABEL,         with: user.password
-        fill_in CONFIRM_PASSWORD_LABEL, with: user.password
+        select_date(Date.new(1990,1,1), { from: 'user_birthdate'} )
+        select 'Female',                 from: GENDER_LABEL
+        select UTC_TIME_ZONE_VALUE,      from: TIME_ZONE_LABEL
+#        fill_in EMAIL_LABEL,            with: new_email
+#        fill_in PASSWORD_LABEL,         with: user.password
+#        fill_in CONFIRM_PASSWORD_LABEL, with: user.password
         click_button "Save changes"
       end
 
@@ -295,7 +307,9 @@ describe "User pages" do
       it { should have_selector('div.alert.alert-success') }
       it { should have_link('Sign out', href: signout_path) }
       specify { expect(user.reload.name).to  eq new_name }
-      specify { expect(user.reload.email).to eq new_email }
+      specify { expect(user.reload.birthdate).to eq Date.new(1990,1,1) }
+      specify { expect(user.reload.gender).to eq 'Female' }
+      specify { expect(user.reload.time_zone).to eq UTC_TIME_ZONE_VALUE }
     end
 
     describe "forbidden attributes" do
@@ -312,6 +326,140 @@ describe "User pages" do
 
   end  
 
+  describe "change email" do
+    let(:user) { FactoryGirl.create(:user) }
+    before do
+      sign_in user
+      visit edit_change_email_path(user)
+    end
+
+    describe "page" do
+      it { should have_content("Change Email") }
+      it { should have_title("Change Email") }
+    end
+
+    describe "with invalid information" do
+
+      describe "email blank" do
+        before do 
+          fill_in EMAIL_LABEL, with: " "
+          click_button CHANGE_EMAIL_BUTTON 
+        end
+
+        it { should have_content('error') }
+      end
+
+      describe "invalid email format missing .com" do
+        before do 
+          fill_in EMAIL_LABEL, with: "foo@bar"
+          click_button CHANGE_EMAIL_BUTTON 
+        end
+
+        it { should have_content('error') }
+        it { should have_content('Email is invalid') }
+      end
+
+      describe "invalid email format missing @" do
+        before do 
+          fill_in EMAIL_LABEL, with: "foobar.com"
+          click_button CHANGE_EMAIL_BUTTON 
+        end
+
+        it { should have_content('error') }
+        it { should have_content('Email is invalid') }
+      end
+     
+    end
+
+    describe "with valid information" do
+      let(:new_email)  { "NewEmail1@nexuscafe.com" }
+
+      before do
+#        save_and_open_page
+        fill_in EMAIL_LABEL,             with: new_email
+        click_button CHANGE_EMAIL_BUTTON 
+      end
+
+      it { should have_content('Email has been changed') }
+      if CONFIG[:verify_email?]
+        it { should have_title('Verify Email Address') }
+      else
+        it { should have_title('Edit user') }
+      end
+      specify { expect(user.reload.email).to  eq new_email.downcase! }
+    end
+  end 
+
+  if CONFIG[:enable_username?]  
+    describe "change username" do
+      let(:user) { FactoryGirl.create(:user) }
+      before do
+        sign_in user
+        visit edit_change_username_path(user)
+      end
+
+      describe "page" do
+        it { should have_content("Change Username") }
+        it { should have_title("Change Username") }
+      end
+
+      describe "with invalid information" do
+
+        describe "username blank" do
+          before do 
+            fill_in USERNAME_LABEL, with: " "
+            click_button CHANGE_USERNAME_BUTTON 
+          end
+
+          it { should have_content('error') }
+        end
+
+        describe "username too short" do
+          before do 
+            fill_in USERNAME_LABEL, with: "a"
+            click_button CHANGE_USERNAME_BUTTON 
+          end
+
+          it { should have_content('error') }
+          it { should have_content('Username is too short') }
+        end
+
+        describe "username too long" do
+          before do 
+            fill_in USERNAME_LABEL, with: "a"*(User::USERNAME_MAX_LENGTH + 1)
+            click_button CHANGE_USERNAME_BUTTON 
+          end
+
+          it { should have_content('error') }
+          it { should have_content('Username is too long') }
+        end
+
+        describe "invalid character in username" do
+          before do 
+            fill_in USERNAME_LABEL, with: "foo@bar"
+            click_button CHANGE_USERNAME_BUTTON 
+          end
+
+          it { should have_content('error') }
+          it { should have_content('Username is invalid') }
+        end
+      end
+
+      describe "with valid information" do
+        let(:new_name)  { "NewUserName" }
+
+        before do
+  #        save_and_open_page
+          fill_in USERNAME_LABEL,             with: new_name
+          click_button CHANGE_USERNAME_BUTTON 
+        end
+
+        it { should have_content('Username has been changed') }
+        it { should have_title('Edit user') }
+        specify { expect(user.reload.username).to  eq new_name }
+      end
+    end  
+  end #if CONFIG[:enable_username?]
 
   describe "When signed in" do
     let(:user) { FactoryGirl.create(:user) }

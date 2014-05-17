@@ -13,8 +13,8 @@ class CreateUsers < ActiveRecord::Migration
       t.string :auth_token
       t.string :validation_token
       t.string :password_reset_token
-      t.string :email_validation_token
       t.datetime :password_reset_sent_at
+      t.string :email_validation_token
       t.string :ip_address_created
       t.string :ip_address_last_modified
       t.string :ip_address_last_login

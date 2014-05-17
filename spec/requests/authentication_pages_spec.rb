@@ -13,6 +13,8 @@ require 'spec_helper'
 
 describe "Authentication" do
 
+  let(:signin_user_label) { 'signin_form_user_id' }
+
   subject { page }
 
   describe "signin page" do
@@ -70,7 +72,7 @@ describe "Authentication" do
       describe "when attempting to visit a protected page" do
         before do
           visit edit_user_path(user)
-          fill_in "Email",    with: user.email
+          fill_in signin_user_label,    with: user.email
           fill_in "Password", with: user.password
           click_button "Sign in"
         end
@@ -104,7 +106,7 @@ describe "Authentication" do
       describe "when attempting to visit a protected page" do
         before do
           visit edit_user_path(user)
-          fill_in "Email",    with: user.email
+          fill_in signin_user_label,    with: user.email
           fill_in "Password", with: user.password
           click_button "Sign in"
         end
@@ -119,8 +121,9 @@ describe "Authentication" do
             before do
               click_link "Sign out"
               visit signin_path
-              fill_in "Email",    with: user.email
+              fill_in "signin_form_user_id",    with: user.email
               fill_in "Password", with: user.password
+              #save_and_open_page
               click_button "Sign in"
             end
 
@@ -128,6 +131,23 @@ describe "Authentication" do
               expect(page).to have_title(user.name)
             end
           end
+
+          if CONFIG[:enable_username?]
+            describe "when signing in again using username" do
+              before do
+                click_link "Sign out"
+                visit signin_path
+                fill_in "signin_form_user_id",    with: user.username
+                fill_in "Password", with: user.password
+                click_button "Sign in"
+              end
+
+              it "should render the default (profile) page" do
+                expect(page).to have_title(user.name)
+              end
+            end
+          end #if CONFIG[:enable_userame?]
+
         end
       end
     end

@@ -47,6 +47,9 @@ Spork.prefork do
     config.order = "random"
     # Include the Capybara DSL so that specs in spec/requests still work.
     config.include Capybara::DSL
+    #Include MailerMacros
+    config.include(MailerMacros)
+    config.before(:each) { reset_email }
     # Disable the old-style object.should syntax.
     config.expect_with :rspec do |c|
       c.syntax = :expect

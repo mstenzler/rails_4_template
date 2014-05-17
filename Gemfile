@@ -75,6 +75,7 @@ gem 'devise'
 group :development, :test do
   gem 'rspec-rails', '>= 2.13.1'
   gem "factory_girl_rails", '>= 4.2.0'
+  gem 'launchy'
 end
 
 # Use unicorn as the app server

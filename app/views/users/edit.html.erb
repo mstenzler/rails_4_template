@@ -3,11 +3,60 @@
 
 <div class="row">
   <div class="col-md-6 col-md-offset-3">
-    <%= bootstrap_form_for(@user) do |f| %>
-	    <%= render 'fields', f: f %>
-      <%= f.submit "Save changes", class: "btn btn-lg btn-primary" %>
+
+    <div class="row">
+      <%= gravatar_for @user %>
+      <a href="http://gravatar.com/emails" target="_blank">change</a>
+    </div>
+
+	  <% if use_username?(@user) %>
+	    <div class="row">
+  		  Username:  <%= @user.username %> - <%= link_to "Change Username", edit_change_username_path(@user) %>
+  		</div>
+	  <% end %>
+
+    <div class="row">
+	    Email: <%= @user.email%> -  <%= link_to "Change Email", edit_change_email_path(@user) %>
+	  </div>
+
+    <div class="row">
+	    Password: XXXXX - <%= link_to "Reset password", new_password_reset_path %>
+	  </div>
+
+	  <% if User::HAS_USER_EDIT_FIELDS %>
+	     <hr/>
+      <%= bootstrap_form_for(@user) do |f| %>
+        <%= render 'shared/error_messages', target: @user %>
+
+		    <% if use_name?(@user) %>
+			      <%= f.text_field :name %>
+		    <% end %>
+
+  		  <% if use_gender?(@user) %>
+			    <%= f.collection_select( :gender, User::VALID_GENDERS, :to_s, :to_s, {}, { :class => "auto-width" }) %>
+  		  <% end %>
+
+		    <% if use_birthdate?(@user) %>
+			    <%= f.date_select :birthdate,
+		                    {  :start_year => 1910,
+		                      :end_year => User::CURRENT_YEAR,
+		                    },
+		                    {
+		                    :class => "small"
+		                    }
+		      %>
+  		  <% end %>
+
+ 			  <% if use_time_zone?(@user) %>
+				  <div class="form-group">
+				    <%= f.label :time_zone %>
+			      <%= f.time_zone_select(:time_zone, ActiveSupport::TimeZone.us_zones, {}, { class: "form-control auto-width", id: "time-zone-select" } )%>
+			    </div>
+			  <% end %>
+
+        <%= f.submit "Save changes", class: "btn btn-lg btn-primary" %>
+      <% end %>
     <% end %>
-    <%= gravatar_for @user %>
-    <a href="http://gravatar.com/emails" target="_blank">change</a>
+
   </div>
 </div>

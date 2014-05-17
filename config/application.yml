@@ -15,6 +15,8 @@ enable_time_zone?: true
 require_time_zone?: true
 verify_email?: true
 user_name_field: email_or_username
+check_remember_me?: true
+password_reset_ttl_hours: 4
 development:
   host: "localhost:3000"
 test:

@@ -174,7 +174,7 @@ describe User do
     describe "when username is too long" do
       before do
        @user.username = "a" * (User::USERNAME_MAX_LENGTH + 1) 
-       p "username length = #{@user.username.length}, USERNAME_MAX_LENGTH +1 = #{User::USERNAME_MAX_LENGTH + 1}"
+#       p "username length = #{@user.username.length}, USERNAME_MAX_LENGTH +1 = #{User::USERNAME_MAX_LENGTH + 1}"
      end
       it { should_not be_valid }
     end
@@ -218,8 +218,6 @@ describe User do
     end
   end
 
-
-
   describe "email address with mixed case" do
     let(:mixed_case_email) { "Foo@ExAMPle.CoM" }
 
@@ -249,4 +247,31 @@ describe User do
     end
   end
 
+  describe "#send_password_reset" do
+    let(:user) { FactoryGirl.create(:user) }
+    let(:last_token) { "" }
+
+
+    describe "generates a unique password_reset_token each time" do
+      before do
+        user.send_password_reset
+        last_token = user.password_reset_token
+        user.send_password_reset
+      end
+
+      specify { expect(user.password_reset_token).not_to eq(last_token) }
+    end
+
+    describe "saves the time the password reset was sent" do
+      before { user.send_password_reset }
+
+      specify { expect(user.reload.password_reset_sent_at).to be_present }
+    end
+
+    describe "delivers email to user" do
+      before { user.send_password_reset }
+
+      specify { expect(last_email.to).to include(user.email) }
+    end
+  end
 end

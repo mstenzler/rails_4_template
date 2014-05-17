@@ -1,0 +1,12 @@
+<% provide(:title, "Change Username") %>
+<h1>Change Username</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+		<%= bootstrap_form_for @user, :url => change_username_path(params[:id]) do |f| %>
+		  <%= render 'shared/error_messages', target: @user %>
+		    <%= f.text_field :username %>
+		    <%= f.submit "Change Username", class: "btn btn-lg btn-primary" %></div>
+		<% end %>
+	</div>
+</div>

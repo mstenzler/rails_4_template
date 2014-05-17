@@ -23,6 +23,7 @@ class UsersController < ApplicationController
     if @user.save
     	sign_in @user
       if CONFIG[:verify_email?]
+        @user.send_email_validation_token
         redirect_to new_user_verify_email_path(@user)
 #        render 'show_verify_email'
       else
@@ -60,6 +61,7 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
 
+=begin
   def verify_email
     @user = User.find(params[:id])
     verify_token = params[:verify_token]
@@ -75,6 +77,7 @@ class UsersController < ApplicationController
       render 'show_verify_email'
     end
   end
+=end
 
   def username_taken?(uname)
     User.username_taken?
@@ -89,12 +92,12 @@ class UsersController < ApplicationController
 
     # Before filters
 
-    def signed_in_user
-    	unless signed_in?
-    		store_location
-        redirect_to signin_url, notice: "Please sign in."
-      end
-    end
+#    def signed_in_user
+#    	unless signed_in?
+#    		store_location
+#        redirect_to signin_url, notice: "Please sign in."
+#      end
+#    end
 
     def correct_user
       @user = User.find(params[:id])

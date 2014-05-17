@@ -14,6 +14,15 @@ def debug(msg, level=0)
   p "DEBUG: #{msg}" if DEBUG_LEVEL > level
 end
 
+def select_date(date, options={})
+  raise ArgumentError, 'from is required option' if options[:from].blank?
+  field = options[:from].to_s
+  select date.year.to_s,               from: "#{field}_1i"
+  select Date::MONTHNAMES[date.month], from: "#{field}_2i"
+  select date.day.to_s,                from: "#{field}_3i"  
+end
+
+
 def valid_signin(user)
   fill_in "Email",    with: user.email
   fill_in "Password", with: user.password

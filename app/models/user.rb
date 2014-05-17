@@ -5,6 +5,8 @@ class User < ActiveRecord::Base
 
   attr_accessor :verify_token 
 
+  PASSWORD_RESET_TTL_HOURS = CONFIG[:password_reset_ttl_hours] || 2
+
   NAME_MAX_LENGTH = 32
   NAME_MIN_LENGTH = 2
   USERNAME_MAX_LENGTH = 24
@@ -32,6 +34,8 @@ class User < ActiveRecord::Base
   MIN_AGE = CONFIG[:min_age].blank? ? nil : CONFIG[:min_age].to_i
   MAX_AGE = CONFIG[:max_age].blank? ? nil : CONFIG[:max_age].to_i 
  # p "MIN_AGE = '#{MIN_AGE}', MAX_AGE = '#{MAX_AGE}'"
+  HAS_USER_EDIT_FIELDS = (CONFIG[:enable_name?] || CONFIG[:enable_gender?] || 
+                          CONFIG[:enable_birthdate?] || CONFIG[:enable_time_zone?] )
 
 #  req_name = CONFIG[:require_name?] || false
   name_can_be_blank = CONFIG[:require_name?] ? false : true
@@ -43,6 +47,10 @@ class User < ActiveRecord::Base
 #  p "IN VALIDATE: gender = '#{gender}', birthdate = '#{birthdate}'"
 #p "IN VALIDATE: name_can_be_blank = '#{name_can_be_blank}', CONFIG[:require_name?] = #{CONFIG[:require_name?]}'"
 
+  has_secure_password
+
+  validates :password, presence: true, confirmation: true, length: { minimum: 6 }, on: :create
+
   validates :name, allow_blank: name_can_be_blank, presence: !name_can_be_blank, 
             format: { with: VALID_NAME_REGEX },
             length: {minimum: NAME_MIN_LENGTH, maximum: NAME_MAX_LENGTH},
@@ -51,11 +59,11 @@ class User < ActiveRecord::Base
 
  #   req_username = CONFIG[:require_username?] || false
  #   p "DEFINING USERNAME. username_can_be_blank = #{username_can_be_blank}"
-    validates :username, allow_blank: username_can_be_blank, presence: !username_can_be_blank, 
-              format: { with: VALID_USERNAME_REGEX },
-              uniqueness: { case_sensitive: false},
-              length: {minimum: USERNAME_MIN_LENGTH, maximum: USERNAME_MAX_LENGTH},
-              if: "CONFIG[:enable_username?]"
+  validates :username, allow_blank: username_can_be_blank, presence: !username_can_be_blank, 
+            format: { with: VALID_USERNAME_REGEX },
+            uniqueness: { case_sensitive: false},
+            length: {minimum: USERNAME_MIN_LENGTH, maximum: USERNAME_MAX_LENGTH},
+            if: "CONFIG[:enable_username?]"
  
   validates :email, presence: true, format: { with: VALID_EMAIL_REGEX },
                     uniqueness: { case_sensitive: false }
@@ -66,7 +74,15 @@ class User < ActiveRecord::Base
   validates :time_zone, allow_blank: time_zone_can_be_blank, presence: !time_zone_can_be_blank, 
              inclusion: { in: ActiveSupport::TimeZone.zones_map(&:name) },
             if: "CONFIG[:enable_time_zone?]"
- 
+
+=begin
+  def password_with_stars
+    len = self.username.length
+    first = username[0]
+    last = username[len-1]
+    first + "x"*(len-2) + last
+  end 
+=end
 
   if CONFIG[:enable_birthdate?]
 #    p "IN enable_birthdate validation. MIN_AGE = #{MIN_AGE}. birthdate_can_be_blank = #{birthdate_can_be_blank}"
@@ -82,9 +98,9 @@ class User < ActiveRecord::Base
     validates_date :birthdate,  date_hash
   end
 
-	has_secure_password
-	validates :password, length: { minimum: 6 }
-  
+#	has_secure_password
+#	validates :password, length: { minimum: 6 }
+
   def User.username_taken?(uname)
     where(username: uname).take ? true : false
   end
@@ -98,11 +114,20 @@ class User < ActiveRecord::Base
   end
 
   def init_unvalidated_email
-    token = User.new_token
-#    p "IN INIT. token = #{token}"
-    self.email_validation_token = User.hash(token)
-    self.email_validated = false
+    if CONFIG[:verify_email?]
+      token = User.new_token
+  #    p "IN INIT. token = #{token}"
+      self.email_validation_token = User.hash(token)
+      self.email_validated = false
+    end
     self.email_changed_at = Time.zone.now
+    self.email.downcase!
+  end
+
+  def reset_email(new_email)
+    self.email = new_email
+    init_unvalidated_email
+    save!
   end
 
   def reset_email_validation_token(overide_token=nil)
@@ -114,12 +139,33 @@ class User < ActiveRecord::Base
     { token: token, hashed_token: hashed_token}
   end
 
+  def send_email_validation_token
+    unless self.email_validation_token
+      raise "email_validation_token is not set when attempting to email the validation code"
+    end
+    UserMailer.email_validation_token(self).deliver
+  end
+
+  def send_password_reset
+    generate_token(:password_reset_token)
+    self.password_reset_sent_at = Time.zone.now
+    save!
+    UserMailer.password_reset(self).deliver
+  end
+
   def set_create_ip_addresses(adr)
     self.ip_address_created = self.ip_address_last_modified = adr
   end
   
   def validate_email
     self.update_attribute :email_validated, true
+  end
+  
+  def generate_token(column, use_hash=false)
+    begin
+      token = use_hash ? User.hash(User.new_token) : User.new_token
+      self[column] = token
+    end while User.exists?(column => self[column])
   end
 
   private
