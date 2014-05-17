@@ -1,12 +1,4 @@
 include ApplicationHelper
-#def full_title(page_title)
-#  base_title = "Ruby on Rails Tutorial Sample App"
-#  if page_title.empty?
-#    base_title
-#  else
-#    "#{base_title} | #{page_title}"
-#  end
-#end
 
 DEBUG_LEVEL = 0
 UTC_TIME_ZONE_VALUE = "UTC"
@@ -22,7 +14,6 @@ def select_date(date, options={})
   select Date::MONTHNAMES[date.month], from: "#{field}_2i"
   select date.day.to_s,                from: "#{field}_3i"  
 end
-
 
 def valid_signin(user)
   fill_in "Email",    with: user.email

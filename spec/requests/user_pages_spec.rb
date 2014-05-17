@@ -8,9 +8,6 @@ CONFIRM_PASSWORD_LABEL = "Password confirmation"
 GENDER_LABEL = "Gender"
 BIRTHDATE_LABEL = "Birthdate"
 TIME_ZONE_LABEL = "time-zone-select"
-#TIME_ZONE_LABEL = "Time zone"
-#UTC_TIME_ZONE_VALUE = "(GMT+00:00) UTC"
-#UTC_TIME_ZONE_VALUE = "UTC"
 CHANGE_USERNAME_BUTTON = "Change Username"
 CHANGE_EMAIL_BUTTON = "Change Email"
 BIRTHDATE = Time.now - 25.years
@@ -190,7 +187,6 @@ describe "User pages" do
         select BIRTHDATE.year, from: 'user_birthdate_1i'
         select 'January', from: 'user_birthdate_2i'
         select BIRTHDATE.day, from: 'user_birthdate_3i'
-#        fill_in BIRTHDATE_LABEL,        with: Date.today - 25.years
         select "Eastern Time (US & Canada)", from: 'time-zone-select'
 #        save_and_open_page
       end
@@ -204,10 +200,8 @@ describe "User pages" do
         let(:user) { User.find_by(email: 'user@example.com') }
 
         if CONFIG[:verify_email?]
- #         p "Showing Verify Email Page after create"
           it { should have_title('Verify Email Address') }
         else
-#          p "Redirecting to @user after create"
           it { should have_link('Sign out') }
           it { should have_title(user.name) }
           it { should have_selector('div.alert.alert-success', text: 'Welcome') }
@@ -253,12 +247,10 @@ describe "User pages" do
         before do
           opts = user.reset_email_validation_token
           user.save!
-#          p "New token = '#{opts[:token]}'"
           fill_in verify_email_label,  with: opts[:token]
           click_button submit
         end
 
-#        it { save_and_open_page; should_not have_content('error') }
         it { should_not have_content('error') }
         it { should have_title('Email Validation Success') }
         specify { expect(user.reload.email_validated).to eq true }
@@ -290,16 +282,13 @@ describe "User pages" do
 
     describe "with valid information" do
       let(:new_name)  { "New Name" }
-#      let(:new_email) { "new@example.com" }
+
       before do
 #        save_and_open_page
         fill_in NAME_LABEL,             with: new_name
         select_date(Date.new(1990,1,1), { from: 'user_birthdate'} )
         select 'Female',                 from: GENDER_LABEL
         select UTC_TIME_ZONE_VALUE,      from: TIME_ZONE_LABEL
-#        fill_in EMAIL_LABEL,            with: new_email
-#        fill_in PASSWORD_LABEL,         with: user.password
-#        fill_in CONFIRM_PASSWORD_LABEL, with: user.password
         click_button "Save changes"
       end
 
@@ -469,20 +458,11 @@ describe "User pages" do
 
     describe "get new user" do
       before do
- ##     	sign_in user, no_capybara: true
       	get new_user_path
       end	 
       specify { expect(response).to redirect_to(root_path) }
     end
 
-#    describe "post create user" do
-#      before do
-#     	sign_in user, no_capybara: true
-#     	post :create, :user => {}
-#    #  	post :create, FactoryGirl.attributes_for(:user)
-#      end 
-#      specify { expect(response).to redirect_to(root_path) }
-#    end
   end
 end  
 

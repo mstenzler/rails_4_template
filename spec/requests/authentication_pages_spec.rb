@@ -1,16 +1,5 @@
 require 'spec_helper'
 
-#describe "AuthenticationPages" do
-#  describe "GET /authentication_pages" do
-#    it "works! (now write some real specs)" do
-#      # Run the generator again with the --webrat flag if you want to use webrat methods/matchers
-#      get authentication_pages_index_path
-#      response.status.should be(200)
-#    end
-#  end
-#end
-
-
 describe "Authentication" do
 
   let(:signin_user_label) { 'signin_form_user_id' }
@@ -187,11 +176,6 @@ describe "Authentication" do
 
     	describe "can't delete self via DELETE request" do
     		it { expect { delete user_path(admin) }.to_not change(User, :count).by(-1) }
-#    		it { expect { delete user_path(admin ) }.not_to change(User, :count) } 
-#    		specify { flash[:error].should =~ /Can not delete own admin account!/i }
-#    		before { delete user_path(admin) }
-#    		specify { response.should redirect_to(users_path),
-#    		          flash[:error].should =~ /Can not delete own admin account!/i }
     	end
     end
 

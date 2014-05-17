@@ -5,7 +5,6 @@ FROM_EMAIL = "mailer@example.com"
 describe UserMailer do
 
   describe 'email validation' do
-#    let(:user) { mock_model User, name: 'Lucas', email: 'lucas@email.com' }
     let(:user) { FactoryGirl.create(:user, email_validation_token: "fooooobarrr") }
     let(:mail) { UserMailer.email_validation_token(user) }
  
@@ -14,7 +13,6 @@ describe UserMailer do
       specify { expect(mail.to).to eq([user.email]) }
       specify { expect(mail.from).to eq([FROM_EMAIL]) }
       specify { expect(mail.body.encoded).to match(verify_email_token_path(user.id, user.email_validation_token)) }
- #     specify { expect(last_email).to include(user.email) }
     end
   end
 

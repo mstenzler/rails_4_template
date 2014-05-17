@@ -14,34 +14,12 @@ def create_user(opts = {})
   debug "In create_user. user = #{@user.inspect}"
 end
 
-#CONFIG = FactoryGirl.build(:full_config)
-
 describe User do
-
-#  p "*******DEBUG_LEVEL = '#{DEBUG_LEVEL}'"
-  #p "CONFIG = '#{CONFIG}'"
-#  CONFIG[:require_username?] = false
-#  CONFIG[:enable_username?] = true
-
 #  CONFIG = FactoryGirl.build(:full_config)
 #  debug "CONFIG = '#{CONFIG}'", 2
 #  reload_user
 
-#  Object.send(:remove_const, :User)
-#  load(File.expand_path("app/models/user.rb", Rails.root))
-
-
-  before do
- #   Object.send(:remove_const, :User)
-#    CONFIG = FactoryGirl.build(:config, enable_username_1?: false, require_username?: false, require_gender?: false, require_birthday?: false)
- #CONFIG[:require_username?] = false
- # CONFIG[:enable_username?] = false
- #   load(File.expand_path("app/models/user.rb", Rails.root))
-   # @user = User.new(name: "Example User", email: "user@example.com",
-    #               password: "foobar", password_confirmation: "foobar") 
-    create_user
-  
-  end
+  before { create_user }
 
   subject { @user }
 
@@ -176,7 +154,6 @@ describe User do
     describe "when username is too long" do
       before do
        @user.username = "a" * (User::USERNAME_MAX_LENGTH + 1) 
-#       p "username length = #{@user.username.length}, USERNAME_MAX_LENGTH +1 = #{User::USERNAME_MAX_LENGTH + 1}"
      end
       it { should_not be_valid }
     end
