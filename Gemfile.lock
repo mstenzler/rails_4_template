@@ -51,6 +51,11 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
+    carrierwave (0.10.0)
+      activemodel (>= 3.2.0)
+      activesupport (>= 3.2.0)
+      json (>= 1.7)
+      mime-types (>= 1.16)
     celluloid (0.15.2)
       timers (~> 1.1.0)
     childprocess (0.4.0)
@@ -64,12 +69,6 @@ GEM
       execjs
     coffee-script-source (1.6.3)
     database_cleaner (1.2.0)
-    devise (3.2.2)
-      bcrypt-ruby (~> 3.0)
-      orm_adapter (~> 0.1)
-      railties (>= 3.2.6, < 5)
-      thread_safe (~> 0.1)
-      warden (~> 1.2.3)
     diff-lcs (1.2.5)
     erubis (2.7.0)
     execjs (2.0.2)
@@ -128,7 +127,6 @@ GEM
     mysql2 (0.3.14)
     nokogiri (1.6.1)
       mini_portile (~> 0.5.0)
-    orm_adapter (0.5.0)
     polyglot (0.3.3)
     populator (1.0.0)
     pry (0.9.12.6)
@@ -222,8 +220,6 @@ GEM
     uglifier (2.4.0)
       execjs (>= 0.3.0)
       json (>= 1.8.0)
-    warden (1.2.3)
-      rack (>= 1.0)
     websocket (1.0.7)
     will_paginate (3.0.5)
     xpath (2.0.0)
@@ -239,10 +235,10 @@ DEPENDENCIES
   bootstrap_form (~> 2.1.1)
   cancan
   capybara (>= 2.1.0)
+  carrierwave
   childprocess (>= 0.3.6)
   coffee-rails (~> 4.0.0)
   database_cleaner (>= 1.2.0)
-  devise
   factory_girl_rails (>= 4.2.0)
   faker
   geocoder

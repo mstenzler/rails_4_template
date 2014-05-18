@@ -70,7 +70,8 @@ gem 'validates_timeliness', github: 'adzap/validates_timeliness', branch: 'rails
 
 # Use ActiveModel has_secure_password
 gem 'bcrypt-ruby', '~> 3.1.2'
-gem 'devise'
+#gem 'devise'
+gem 'carrierwave'
 
 group :development, :test do
   gem 'rspec-rails', '>= 2.13.1'
