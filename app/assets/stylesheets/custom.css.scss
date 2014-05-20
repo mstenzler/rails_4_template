@@ -37,6 +37,10 @@ textarea {
   }
 }
 
+.white-no-wrap {
+  white-space: nowrap;
+}
+
 /* typography */
 
 h1, h2, h3, h4, h5, h6 {
@@ -144,11 +148,6 @@ aside {
   }
 }
 
-.gravatar {
-  float: left;
-  margin-right: 10px;
-}
-
 /* forms */
 
 input[type="submit"] {
@@ -157,7 +156,7 @@ input[type="submit"] {
 
 input, textarea, select, .uneditable-input {
   border: 1px solid #bbb;
-  width: 100%;
+ /* width: 100%; */
   margin-bottom: 15px;
   @include box_sizing;
 }
@@ -200,4 +199,34 @@ input {
       border-bottom: 1px solid $gray-lighter;
     }
   }
+}
+
+/* Avatar and Gravatar */
+.gravatar {
+  float: left;
+  margin-right: 10px;
+}
+
+.avatar-image {
+  float: left;
+  margin-right: 10px;
+}
+.gravatar-change-form {
+  margin: 10px;
+}
+.avatar-change-form {
+  margin: 10px;
+}
+.current-avatar {
+  margin-bottom: 4px;
+  span.form-title {
+    font-weight: bold;
+  }
+}
+
+#user-avatar-none-field {
+  display: none;
+}
+#user-avatar-gravatar-field {
+  display: none;
 }

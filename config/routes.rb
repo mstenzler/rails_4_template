@@ -5,6 +5,7 @@ SampleApp::Application.routes.draw do
     resources :verify_emails, only: [:new, :create], shallow: true
     resources :change_usernames, only: [:edit, :update], shallow: true
     resources :change_emails, only: [:edit, :update], shallow: true
+    resources :change_avatars, only: [:edit, :update], shallow: true
   end
 
   get '/users/:user_id/verify_email_token/:verify_token', 

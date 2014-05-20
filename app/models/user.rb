@@ -3,6 +3,8 @@ class User < ActiveRecord::Base
 	before_create :create_remember_token
   before_save :init_new_user
 
+  mount_uploader :avatar, AvatarUploader
+  
   attr_accessor :verify_token 
 
   PASSWORD_RESET_TTL_HOURS = CONFIG[:password_reset_ttl_hours] || 2
@@ -25,6 +27,15 @@ class User < ActiveRecord::Base
   FEMALE_VALUE = VALID_GENDERS[1]
   TRANSGENDER_VALUE = VALID_GENDERS[2]
   OTHER_GENDER_VALUE = VALID_GENDERS[3] 
+
+  VALID_AVATAR_TYPES = ["None", "Gravatar", "Upload"]
+  NO_AVATAR = VALID_AVATAR_TYPES[0]
+  GRAVATAR_AVATAR = VALID_AVATAR_TYPES[1]
+  UPLOAD_AVATAR = VALID_AVATAR_TYPES[2]
+
+  GRAVATAR_SIZE_MAP = { tiny: "50", small: "70", medium: "100", large: "150"}
+
+  DEFAULT_AVATAR_DIR = CONFIG[:default_avatar_dir] || "/images/default_avatar"
 
   START_YEAR = 1900
   VALID_DATES = DateTime.new(START_YEAR)..DateTime.now
@@ -75,15 +86,6 @@ class User < ActiveRecord::Base
              inclusion: { in: ActiveSupport::TimeZone.zones_map(&:name) },
             if: "CONFIG[:enable_time_zone?]"
 
-=begin
-  def password_with_stars
-    len = self.username.length
-    first = username[0]
-    last = username[len-1]
-    first + "x"*(len-2) + last
-  end 
-=end
-
   if CONFIG[:enable_birthdate?]
 #    p "IN enable_birthdate validation. MIN_AGE = #{MIN_AGE}. birthdate_can_be_blank = #{birthdate_can_be_blank}"
     date_hash = { allow_blank: birthdate_can_be_blank }
@@ -93,13 +95,8 @@ class User < ActiveRecord::Base
     if !MAX_AGE.nil?
       date_hash.merge!(on_or_after: Proc.new{ MAX_AGE.years.ago }, on_or_after_message: "Cannot be more than #{MAX_AGE} years old")
     end
-#    p "date_hash = #{date_hash}"
-#    p "date_hash keys = #{date_hash.keys}"
     validates_date :birthdate,  date_hash
   end
-
-#	has_secure_password
-#	validates :password, length: { minimum: 6 }
 
   def User.username_taken?(uname)
     where(username: uname).take ? true : false
@@ -111,6 +108,10 @@ class User < ActiveRecord::Base
 
   def User.hash(token)
     Digest::SHA1.hexdigest(token.to_s)
+  end
+  
+  def User.build_default_avatar_url(gender=:other, size=:small)
+    "#{DEFAULT_AVATAR_DIR}/#{gender.to_s.downcase}/#{size.to_s.downcase}.png" 
   end
 
   def init_unvalidated_email
@@ -168,6 +169,40 @@ class User < ActiveRecord::Base
     end while User.exists?(column => self[column])
   end
 
+  def avatar_url(size=:small)
+    size = size.to_sym if size.class != Symbol
+    ret = nil
+
+    case avatar_type
+    when GRAVATAR_AVATAR
+      ret = gravatar_url(self, GRAVATAR_SIZE_MAP[size])
+    when UPLOAD_AVATAR 
+      if !avatar.blank?
+        ret = avatar.url(size).to_s
+      else
+        ret = default_avatar_url(size)
+      end
+    else
+      ret = nil
+    end
+    ret
+  end
+
+  def has_avatar?
+    ([GRAVATAR_AVATAR, UPLOAD_AVATAR].include? avatar_type) && !avatar.blank?
+  end
+
+  def default_avatar_url(size=:small)
+    case gender
+    when MALE_VALUE
+      User.build_default_avatar_url(MALE_VALUE, size)
+    when FEMALE_VALUE
+      User.build_default_avatar_url(FEMALE_VALUE, size)
+    else
+      User.build_default_avatar_url(OTHER_GENDER_VALUE, size)
+    end
+  end
+
   private
 
     def create_remember_token
@@ -179,6 +214,7 @@ class User < ActiveRecord::Base
     end
 
     def init_new_user
+      self.avatar_type ||= NO_AVATAR
       if new_record?
         init_unvalidated_email
       end

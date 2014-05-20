@@ -5,8 +5,15 @@
   <div class="col-md-6 col-md-offset-3">
 
     <div class="row">
-      <%= gravatar_for @user %>
-      <a href="http://gravatar.com/emails" target="_blank">change</a>
+    	Avatar:
+    	<% if @user.avatar_type.blank? || @user.avatar_type == User::NO_AVATAR %>
+    	 NONE
+    	<% else %>
+      	<%= render 'shared/avatar', user: @user %>
+      <% end %>
+      <%= link_to "Change Avatar", edit_change_avatar_path(@user) %>
+
+     <% #  <a href="http://gravatar.com/emails" target="_blank">change</a> %>
     </div>
 
 	  <% if use_username?(@user) %>

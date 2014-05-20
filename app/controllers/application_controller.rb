@@ -3,10 +3,9 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
   around_filter :user_time_zone, if: :current_user
-  include SessionsHelper
+  helper_method :gravatar_for
 
-#  p "CONFIG = '#{CONFIG}'"
-#  p "user_form_options = '#{CONFIG[:user_form_options]}'"
+  include SessionsHelper
 
   #For each of the user_form_options define require_#{option_name} and
   #enable_#{option_name} methods and make each one a helper method as well
@@ -33,6 +32,19 @@ class ApplicationController < ActionController::Base
   		store_location
       redirect_to signin_url, notice: "Please sign in."
     end
+  end
+
+  # Returns the Gravatar (http://gravatar.com/) for the given user.
+  def gravatar_for(user, options = { size: 50 })
+    gravatar_url = gravatar_url(user, options)
+    gravatar_class = options[:class] || "gravatar"
+    ActionController::Base.helpers.image_tag(gravatar_url, alt: user.name, class: gravatar_class)
+  end
+
+  def gravatar_url(user, options = { size: 50 })
+    gravatar_id = Digest::MD5::hexdigest(user.email.downcase)
+    size = options[:size] || User::GRAVATAR_SIZE_MAP[:small]
+    gravatar_url = "https://secure.gravatar.com/avatar/#{gravatar_id}?s=#{size}"
   end
 
   private

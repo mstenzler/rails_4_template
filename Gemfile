@@ -72,6 +72,7 @@ gem 'validates_timeliness', github: 'adzap/validates_timeliness', branch: 'rails
 gem 'bcrypt-ruby', '~> 3.1.2'
 #gem 'devise'
 gem 'carrierwave'
+gem 'mini_magick'
 
 group :development, :test do
   gem 'rspec-rails', '>= 2.13.1'

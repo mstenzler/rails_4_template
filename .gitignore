@@ -24,6 +24,7 @@ capybara-*.html
 .rspec
 .rvmrc
 /public/system
+/public/uploads
 /coverage/
 /spec/tmp
 **.orig

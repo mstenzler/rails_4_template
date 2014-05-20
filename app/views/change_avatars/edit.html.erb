@@ -1,0 +1,48 @@
+<% provide(:title, "Change Avatar") %>
+<h1>Change Avatar</h1>
+
+<div class="row">
+  <div class="col-md-6 col-md-offset-3">
+  	<div class="current-avatar">
+	  	<span class="form-title">Current Avatar:</span> 
+	  	<% if @user.has_avatar? %>
+	  	  <div id="edit-user-avatar-display">
+  	    	<%= render 'shared/avatar', user: @user, size: :small, html_class: "avatar-change-form" %>
+  	    </div>
+	    <% else %>
+	      Not set
+	    <% end %>
+	  </div>
+		<%= bootstrap_form_for(@user, layout: :vertical, label_col: "col-sm-3", control_col: "col-sm-9", :url => change_avatar_path(params[:id], :html => {:multipart => true} ) ) do |f| %>
+		  <%= render 'shared/error_messages', target: @user %>
+		  <fieldset>
+
+		  <% f.collection_radio_buttons :avatar_type, User::VALID_AVATAR_TYPES, :to_s, :to_s, inline: true, label: "Avatar Source: ", help: "Choose which method to add an Avatar to your profile" %>
+		 
+		  <%= f.form_group :avatar_type, label: { text: "Avatar Source" }, help: "Choose which method to add an Avatar to your profile" do %>
+		    <% User::VALID_AVATAR_TYPES.each do |atype| %>
+  		    <%= f.radio_button :avatar_type, atype, label: atype, inline: true %>
+  		  <% end %>
+  		<% end %>
+
+  		<div id="user-avatar-none-field">
+  			<p>Do not use an avatar for this user</p>
+  		</div>
+   		<div id="user-avatar-gravatar-field">
+  			<div class="form-group">
+  				<label class="control-label">Gravatar:</label>
+    			<%= gravatar_for(@user, { class: "gravatar-change-form" }) %>
+    			<span class="help-block">This is your gravatar linked to your email. you can <a href="http://gravatar.com/emails" target="_blank">change this here</a></span>
+    		</div>
+  		</div>
+  		<div id="user-avatar-upload-field">
+  		  <%= f.file_field :avatar, help: "Choose a file to uplaod from your local computer to use as your avatar" %>
+  		</div>  		
+		  <%= f.submit "Update Avatar", class: "btn btn-lg btn-primary" %></div>
+		</fieldset>
+		<% end %>
+	</div>
+</div>
+<script type='text/javascript'>
+  $(document).ready( $("input[name='user[avatar_type]']").watchAvatarType() )
+</script>
