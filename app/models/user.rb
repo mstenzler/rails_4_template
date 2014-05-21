@@ -34,7 +34,10 @@ class User < ActiveRecord::Base
   UPLOAD_AVATAR = VALID_AVATAR_TYPES[2]
 
   GRAVATAR_SIZE_MAP = { tiny: "50", small: "70", medium: "100", large: "150"}
+  IMAGE_RESIZE_MAP = { tiny: [30, 30], small:[60, 60] , medium: [100, 100], 
+                     large: [200, 200], original: [400, 400] }
 
+   
   DEFAULT_AVATAR_DIR = CONFIG[:default_avatar_dir] || "/images/default_avatar"
 
   START_YEAR = 1900
@@ -110,8 +113,15 @@ class User < ActiveRecord::Base
     Digest::SHA1.hexdigest(token.to_s)
   end
   
-  def User.build_default_avatar_url(gender=:other, size=:small)
-    "#{DEFAULT_AVATAR_DIR}/#{gender.to_s.downcase}/#{size.to_s.downcase}.png" 
+  def User.build_default_avatar_url(opts={})
+    size = opts[:size] || nil
+    gender = opts[:gender] || nil
+    filename = size.nil? ? "avatar.png" : "#{size.to_s.downcase}_avatar.png"
+    if gender.nil?
+      "#{DEFAULT_AVATAR_DIR}/default/{filename}"
+    else
+      "#{DEFAULT_AVATAR_DIR}/#{gender.to_s.downcase}/#{filename}" 
+    end
   end
 
   def init_unvalidated_email
@@ -183,7 +193,7 @@ class User < ActiveRecord::Base
         ret = default_avatar_url(size)
       end
     else
-      ret = nil
+      ret = default_avatar_url(size)
     end
     ret
   end
@@ -193,13 +203,17 @@ class User < ActiveRecord::Base
   end
 
   def default_avatar_url(size=:small)
-    case gender
-    when MALE_VALUE
-      User.build_default_avatar_url(MALE_VALUE, size)
-    when FEMALE_VALUE
-      User.build_default_avatar_url(FEMALE_VALUE, size)
+    if CONFIG[:use_avatar_gender_default?]
+      case gender
+      when MALE_VALUE
+        User.build_default_avatar_url(size: size, gender: MALE_VALUE)
+      when FEMALE_VALUE
+        User.build_default_avatar_url(size: size, gender: FEMALE_VALUE)
+      else
+        User.build_default_avatar_url(size: size, gender: OTHER_GENDER_VALUE)
+      end
     else
-      User.build_default_avatar_url(OTHER_GENDER_VALUE, size)
+      User.build_default_avatar_url(size: size)
     end
   end
 

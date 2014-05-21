@@ -16,7 +16,13 @@ require_time_zone?: true
 verify_email?: true
 user_name_field: email_or_username
 check_remember_me?: true
+use_avatar_gender_default?: true
 password_reset_ttl_hours: 4
+original_avatar_size: [400, 400]
+large_avatar_size: [200, 200]
+medium_avatar_size: [100, 100]
+small_avatar_size: [60, 60]
+tiny__avatar_size: [30, 30]
 development:
   host: "localhost:3000"
 test:

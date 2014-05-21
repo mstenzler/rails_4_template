@@ -32,19 +32,20 @@ class AvatarUploader < CarrierWave::Uploader::Base
   # def scale(width, height)
   #   # do something
   # end
-  process :resize_to_fit => [200, 200]
+
+  process :resize_to_fit => CONFIG[:original_avatar_size] || [400, 400]
 
   version :large do
-    process :resize_to_fit => [150, 150]
+    process :resize_to_fit => CONFIG[:large_avatar_size] || [200, 200]
   end
   version :medium do
-    process :resize_to_fit => [100, 100]
+    process :resize_to_fit => CONFIG[:medium_avatar_size] || [100, 100]
   end
   version :small do
-    process :resize_to_fit => [70, 70]
+    process :resize_to_fit => CONFIG[:small_avatar_size] || [60, 60]
   end
   version :tiny do
-    process :resize_to_fit => [40, 40]
+    process :resize_to_fit => CONFIG[:tiny_avatar_size] || [30, 30]
   end
 
   # Create different versions of your uploaded files:
