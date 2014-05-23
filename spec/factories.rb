@@ -13,6 +13,10 @@ FactoryGirl.define do
     factory :admin do
       admin true
     end
+
+    factory :user_with_avatar do
+      avatar Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, '/spec/fixtures/files/testfile.png')))
+    end
   end
 
   factory :min_user, class: User do
@@ -71,4 +75,5 @@ FactoryGirl.define do
 
     initialize_with { attributes } 
   end
+
 end

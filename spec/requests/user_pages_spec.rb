@@ -268,7 +268,9 @@ describe "User pages" do
     describe "page" do
       it { should have_content("Update your profile") }
       it { should have_title("Edit user") }
-      it { should have_link('change', href: 'http://gravatar.com/emails') }
+      it { should have_link('Change Username', edit_change_username_path(user)) }
+      it { should have_link('Change Email', edit_change_email_path(user)) }
+      it { should have_link('Reset Password', new_password_reset_path()) }
     end
 
     describe "with invalid information" do

@@ -179,8 +179,8 @@ class User < ActiveRecord::Base
     end while User.exists?(column => self[column])
   end
 
-  def avatar_url(size=:small)
-    size = size.to_sym if size.class != Symbol
+  def avatar_url(size=nil)
+    size = size.to_sym if (!size.nil? && size.class != Symbol)
     ret = nil
 
     case avatar_type
@@ -188,14 +188,14 @@ class User < ActiveRecord::Base
       ret = gravatar_url(self, GRAVATAR_SIZE_MAP[size])
     when UPLOAD_AVATAR 
       if !avatar.blank?
-        ret = avatar.url(size).to_s
+        ret = avatar.url(size)
       else
         ret = default_avatar_url(size)
       end
     else
       ret = default_avatar_url(size)
     end
-    ret
+    ret.to_s
   end
 
   def has_avatar?

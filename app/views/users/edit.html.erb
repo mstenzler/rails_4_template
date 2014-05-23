@@ -9,7 +9,7 @@
     	<% if @user.avatar_type.blank? || @user.avatar_type == User::NO_AVATAR %>
     	 NONE
     	<% else %>
-      	<%= render 'shared/avatar', user: @user %>
+      	<%= render 'shared/avatar', size: :medium, user: @user %>
       <% end %>
       <%= link_to "Change Avatar", edit_change_avatar_path(@user) %>
 
@@ -27,7 +27,7 @@
 	  </div>
 
     <div class="row">
-	    Password: XXXXX - <%= link_to "Reset password", new_password_reset_path %>
+	    Password: XXXXX - <%= link_to "Reset Password", new_password_reset_path %>
 	  </div>
 
 	  <% if User::HAS_USER_EDIT_FIELDS %>
