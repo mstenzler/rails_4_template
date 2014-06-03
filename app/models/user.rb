@@ -5,7 +5,7 @@ class User < ActiveRecord::Base
 
   mount_uploader :avatar, AvatarUploader
   
-  attr_accessor :verify_token 
+  attr_accessor :verify_token, :unhashed_email_validation_token
 
   PASSWORD_RESET_TTL_HOURS = CONFIG[:password_reset_ttl_hours] || 2
 
@@ -128,6 +128,7 @@ class User < ActiveRecord::Base
     if CONFIG[:verify_email?]
       token = User.new_token
   #    p "IN INIT. token = #{token}"
+      self.unhashed_email_validation_token = token
       self.email_validation_token = User.hash(token)
       self.email_validated = false
     end
@@ -144,6 +145,7 @@ class User < ActiveRecord::Base
   def reset_email_validation_token(overide_token=nil)
     #helpful for testing
     token = overide_token.nil? ? User.new_token : overide_token
+    self.unhashed_email_validation_token = token
     hashed_token = User.hash(token)
     self.email_validation_token = hashed_token
     self.email_validated = false
@@ -151,7 +153,7 @@ class User < ActiveRecord::Base
   end
 
   def send_email_validation_token
-    unless self.email_validation_token
+    unless self.email_validation_token && self.unhashed_email_validation_token
       raise "email_validation_token is not set when attempting to email the validation code"
     end
     UserMailer.email_validation_token(self).deliver
